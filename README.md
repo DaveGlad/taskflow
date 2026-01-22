@@ -2,6 +2,10 @@
 
 > Application moderne de gestion de tâches construite avec les principes de Clean Architecture, React, TypeScript et MongoDB.
 
+## Auteurs
+
+- **Mouhcene AYADI** - Contributeur
+
 ## Table des Matières
 
 - [Architecture Overview](#architecture-overview)
