@@ -1,0 +1,321 @@
+name: TaskFlow CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ──────────────────────────────────────────────
+  # PARALLEL: Lint backend & frontend
+  # ──────────────────────────────────────────────
+
+  lint-backend:
+    name: Lint Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Display environment variable (P3 - visible)
+        run: echo "APP_ENVIRONMENT=${{ vars.APP_ENVIRONMENT }}"
+
+      - name: Display secret (P3 - masked)
+        run: echo "MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}"
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: backend
+
+  lint-frontend:
+    name: Lint Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: frontend
+
+  # ──────────────────────────────────────────────
+  # PARALLEL: Unit tests (self-hosted) & build check
+  # ──────────────────────────────────────────────
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: self-hosted
+    needs: [lint-backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Run unit tests
+        run: npx vitest run
+        working-directory: backend
+
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: backend/test-results/unit-results.xml
+          retention-days: 14
+
+  build-frontend-check:
+    name: Build Frontend Check
+    runs-on: ubuntu-latest
+    needs: [lint-frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+  # ──────────────────────────────────────────────
+  # SEQUENTIAL: Integration tests (after unit tests)
+  # ──────────────────────────────────────────────
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      MONGODB_URI: mongodb://localhost:27017/taskflow-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Run integration tests
+        run: TEST_SUITE=integration npx vitest run
+        working-directory: backend
+
+      - name: Upload integration test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: backend/test-results/integration-results.xml
+          retention-days: 14
+
+  # ──────────────────────────────────────────────
+  # Analyze test reports (consumes artifacts from both test jobs)
+  # ──────────────────────────────────────────────
+
+  analyze-test-reports:
+    name: Analyze Test Reports
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: always()
+    steps:
+      - name: Download unit test report
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-test-report
+          path: reports/unit
+
+      - name: Download integration test report
+        uses: actions/download-artifact@v4
+        with:
+          name: integration-test-report
+          path: reports/integration
+
+      - name: Parse and display test results
+        run: |
+          echo "========================================"
+          echo "       TEST RESULTS SUMMARY"
+          echo "========================================"
+          echo ""
+
+          TOTAL_TESTS=0
+          TOTAL_FAILURES=0
+          TOTAL_ERRORS=0
+
+          for report in reports/unit/*.xml reports/integration/*.xml; do
+            if [ -f "$report" ]; then
+              echo "--- $(basename $(dirname $report))/$(basename $report) ---"
+
+              TESTS=$(grep -oP 'tests="\K[0-9]+' "$report" | head -1)
+              FAILURES=$(grep -oP 'failures="\K[0-9]+' "$report" | head -1)
+              ERRORS=$(grep -oP 'errors="\K[0-9]+' "$report" | head -1)
+
+              TESTS=${TESTS:-0}
+              FAILURES=${FAILURES:-0}
+              ERRORS=${ERRORS:-0}
+
+              echo "  Tests: $TESTS | Failures: $FAILURES | Errors: $ERRORS"
+              echo ""
+
+              TOTAL_TESTS=$((TOTAL_TESTS + TESTS))
+              TOTAL_FAILURES=$((TOTAL_FAILURES + FAILURES))
+              TOTAL_ERRORS=$((TOTAL_ERRORS + ERRORS))
+            fi
+          done
+
+          echo "========================================"
+          echo "  TOTAL: $TOTAL_TESTS tests | $TOTAL_FAILURES failures | $TOTAL_ERRORS errors"
+          echo "========================================"
+
+          if [ "$TOTAL_FAILURES" -gt 0 ] || [ "$TOTAL_ERRORS" -gt 0 ]; then
+            echo "::error::Some tests failed!"
+            exit 1
+          else
+            echo "All tests passed!"
+          fi
+
+      - name: Upload combined test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-test-reports
+          path: reports/
+          retention-days: 30
+
+  # ──────────────────────────────────────────────
+  # PARALLEL: Multi-environment builds (matrix)
+  # ──────────────────────────────────────────────
+
+  build-environments:
+    name: Build (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    needs: [integration-tests, build-frontend-check]
+    strategy:
+      matrix:
+        include:
+          - environment: dev
+            api_url: http://localhost:3000
+          - environment: staging
+            api_url: https://api-staging.taskflow.example.com
+          - environment: prod
+            api_url: https://api.taskflow.example.com
+    env:
+      VITE_API_URL: ${{ matrix.api_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build backend
+        run: npm run build
+        working-directory: backend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+        env:
+          VITE_API_URL: ${{ matrix.api_url }}
+
+      - name: Generate build-info.json
+        run: |
+          cat > build-info.json << EOF
+          {
+            "environment": "${{ matrix.environment }}",
+            "api_url": "${{ matrix.api_url }}",
+            "commit_sha": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "build_number": "${{ github.run_number }}",
+            "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cat build-info.json
+
+      - name: Upload backend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build-${{ matrix.environment }}
+          path: |
+            backend/dist/
+            build-info.json
+          retention-days: 7
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ matrix.environment }}
+          path: |
+            frontend/dist/
+            build-info.json
+          retention-days: 7
