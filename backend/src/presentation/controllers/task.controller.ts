@@ -5,7 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { TaskService } from '../../application';
-import type { TaskFilters, PaginationOptions } from '../../domain';
+import type { TaskFilters, PaginationOptions, TaskStatusType, TaskPriorityType } from '../../domain';
 
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
@@ -13,8 +13,8 @@ export class TaskController {
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const filters: TaskFilters = {};
-      if (req.query.status) filters.status = req.query.status as string;
-      if (req.query.priority) filters.priority = req.query.priority as string;
+      if (req.query.status) filters.status = req.query.status as TaskStatusType;
+      if (req.query.priority) filters.priority = req.query.priority as TaskPriorityType;
       if (req.query.search) filters.search = req.query.search as string;
 
       const tasks = await this.taskService.findAll(Object.keys(filters).length > 0 ? filters : undefined);
@@ -27,8 +27,8 @@ export class TaskController {
   getPaginated = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const filters: TaskFilters = {};
-      if (req.query.status) filters.status = req.query.status as string;
-      if (req.query.priority) filters.priority = req.query.priority as string;
+      if (req.query.status) filters.status = req.query.status as TaskStatusType;
+      if (req.query.priority) filters.priority = req.query.priority as TaskPriorityType;
 
       const pagination: PaginationOptions = {
         page: parseInt(req.query.page as string) || 1,
@@ -56,7 +56,7 @@ export class TaskController {
 
   getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const task = await this.taskService.findById(req.params.id);
+      const task = await this.taskService.findById(req.params['id'] as string);
       res.json({ success: true, data: task });
     } catch (error) {
       next(error);
@@ -74,7 +74,7 @@ export class TaskController {
 
   update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const task = await this.taskService.update(req.params.id, req.body);
+      const task = await this.taskService.update(req.params['id'] as string, req.body);
       res.json({ success: true, data: task });
     } catch (error) {
       next(error);
@@ -83,7 +83,7 @@ export class TaskController {
 
   delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      await this.taskService.delete(req.params.id);
+      await this.taskService.delete(req.params['id'] as string);
       res.status(204).send();
     } catch (error) {
       next(error);
@@ -92,7 +92,7 @@ export class TaskController {
 
   markAsCompleted = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const task = await this.taskService.markAsCompleted(req.params.id);
+      const task = await this.taskService.markAsCompleted(req.params['id'] as string);
       res.json({ success: true, data: task });
     } catch (error) {
       next(error);
@@ -101,7 +101,7 @@ export class TaskController {
 
   markAsInProgress = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const task = await this.taskService.markAsInProgress(req.params.id);
+      const task = await this.taskService.markAsInProgress(req.params['id'] as string);
       res.json({ success: true, data: task });
     } catch (error) {
       next(error);

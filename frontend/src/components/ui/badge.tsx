@@ -16,6 +16,7 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
         // Custom variants for task status and priority
+        todo: "border-transparent bg-gray-100 text-gray-800",
         pending: "border-transparent bg-yellow-100 text-yellow-800",
         in_progress: "border-transparent bg-blue-100 text-blue-800",
         completed: "border-transparent bg-green-100 text-green-800",

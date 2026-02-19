@@ -60,7 +60,7 @@ export class MongoTaskRepository implements ITaskRepository {
       status: task.status.value,
       priority: task.priority.value,
     });
-    return this.toDomain(document.toObject());
+    return this.toDomain(document.toObject() as unknown as Record<string, unknown>);
   }
 
   async update(task: Task): Promise<Task> {

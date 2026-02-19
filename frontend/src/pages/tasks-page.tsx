@@ -40,11 +40,11 @@ export function TasksPage() {
   const markAsCompleted = useMarkTaskAsCompleted();
   const markAsInProgress = useMarkTaskAsInProgress();
 
-  const handleCreateTask = (data: CreateTaskInput) => {
-    createTask.mutate(data, { onSuccess: () => setCreateDialogOpen(false) });
+  const handleCreateTask = (data: CreateTaskInput | UpdateTaskInput) => {
+    createTask.mutate(data as CreateTaskInput, { onSuccess: () => setCreateDialogOpen(false) });
   };
 
-  const handleUpdateTask = (data: UpdateTaskInput) => {
+  const handleUpdateTask = (data: CreateTaskInput | UpdateTaskInput) => {
     if (!selectedTask) return;
     updateTask.mutate({ id: selectedTask.id, data }, {
       onSuccess: () => {
