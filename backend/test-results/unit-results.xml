@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="51" failures="0" errors="0" time="0.254">
+    <testsuite name="src/__tests__/unit/domain/task-domain-service.test.ts" timestamp="2026-02-19T14:02:06.320Z" hostname="MacBook-Air-de-Dave.local" tests="20" failures="0" errors="0" skipped="0" time="0.005994834">
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; sortByPriorityAndDate &gt; should sort tasks by priority (high first)" time="0.001260084">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; sortByPriorityAndDate &gt; should sort by date (newest first) when same priority" time="0.000626542">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; sortByPriorityAndDate &gt; should return empty array for empty input" time="0.00036375">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; sortByPriorityAndDate &gt; should not mutate the original array" time="0.000239625">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; calculateCompletionRate &gt; should return 0 for empty array" time="0.000095584">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; calculateCompletionRate &gt; should return 0 when no tasks are completed" time="0.000136541">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; calculateCompletionRate &gt; should return 100 when all tasks are completed" time="0.000094292">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; calculateCompletionRate &gt; should calculate correct rate for mixed statuses" time="0.000063042">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; calculateCompletionRate &gt; should round the completion rate" time="0.000067875">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow todo → in_progress" time="0.00007725">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow todo → completed" time="0.000066459">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow in_progress → todo" time="0.000062417">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow in_progress → completed" time="0.000045292">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow completed → todo" time="0.000043833">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should allow completed → in_progress" time="0.000063708">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; canTransitionStatus &gt; should not allow same-status transition (todo → todo)" time="0.000214">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; getStatistics &gt; should return correct counts by status and priority" time="0.000247291">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; getStatistics &gt; should handle empty array" time="0.000112834">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; groupByStatus &gt; should group tasks by their status" time="0.000526584">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-domain-service.test.ts" name="TaskDomainService &gt; groupByStatus &gt; should return empty object for empty array" time="0.000064083">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/unit/domain/task-entity.test.ts" timestamp="2026-02-19T14:02:06.325Z" hostname="MacBook-Air-de-Dave.local" tests="11" failures="0" errors="0" skipped="0" time="0.004239958">
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should create a task with default values" time="0.0019225">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should trim the title" time="0.000129041">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should throw an error if title is empty" time="0.000528583">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should throw an error if title is only whitespace" time="0.000125875">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should throw an error if title exceeds 200 characters" time="0.000158333">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; create() &gt; should throw an error if description exceeds 2000 characters" time="0.000115833">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; immutable methods &gt; updateTitle should return a new Task with the updated title" time="0.000126042">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; immutable methods &gt; markAsInProgress should return a new Task with in_progress status" time="0.000091875">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; immutable methods &gt; markAsCompleted should return a new Task with completed status" time="0.000130125">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; isCompleted() &gt; should return true when status is completed" time="0.000095125">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-entity.test.ts" name="Task Entity &gt; isCompleted() &gt; should return false when status is not completed" time="0.000075958">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/unit/domain/task-priority.test.ts" timestamp="2026-02-19T14:02:06.330Z" hostname="MacBook-Air-de-Dave.local" tests="10" failures="0" errors="0" skipped="0" time="0.002065833">
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; create() &gt; should create a valid priority from string" time="0.000537042">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; create() &gt; should accept all valid values" time="0.000103166">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; create() &gt; should throw an error for invalid value" time="0.000424708">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; isValid() &gt; should return true for valid priorities" time="0.000075625">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; isValid() &gt; should return false for invalid priorities" time="0.000065042">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; factory methods &gt; low() should create a low priority" time="0.000064542">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; factory methods &gt; medium() should create a medium priority" time="0.000049667">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; factory methods &gt; high() should create a high priority" time="0.0000455">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; equals() &gt; should return true for same priority values" time="0.000054833">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-priority.test.ts" name="TaskPriority Value Object &gt; equals() &gt; should return false for different priority values" time="0.000053791">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/unit/domain/task-status.test.ts" timestamp="2026-02-19T14:02:06.332Z" hostname="MacBook-Air-de-Dave.local" tests="10" failures="0" errors="0" skipped="0" time="0.00207875">
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; create() &gt; should create a valid status from string" time="0.000548667">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; create() &gt; should accept all valid values" time="0.000110583">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; create() &gt; should throw an error for invalid value" time="0.000380583">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; isValid() &gt; should return true for valid statuses" time="0.000076125">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; isValid() &gt; should return false for invalid statuses" time="0.00006725">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; factory methods &gt; todo() should create a todo status" time="0.000063875">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; factory methods &gt; inProgress() should create an in_progress status" time="0.000050542">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; factory methods &gt; completed() should create a completed status" time="0.000048333">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; equals() &gt; should return true for same status values" time="0.000054833">
+        </testcase>
+        <testcase classname="src/__tests__/unit/domain/task-status.test.ts" name="TaskStatus Value Object &gt; equals() &gt; should return false for different status values" time="0.000054916">
+        </testcase>
+    </testsuite>
+</testsuites>
