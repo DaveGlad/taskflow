@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Task } from '../../../domain/entities/task.entity';
 import { TaskStatus } from '../../../domain/value-objects/task-status.vo';
-import { TaskPriority } from '../../../domain/value-objects/task-priority.vo';
 
 describe('Task Entity', () => {
   describe('create()', () => {

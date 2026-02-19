@@ -47,7 +47,7 @@ export class MongoTaskRepository implements ITaskRepository {
     try {
       const document = await TaskModel.findById(id).lean();
       return document ? this.toDomain(document) : null;
-    } catch (error) {
+    } catch {
       logger.debug(`Task not found with id: ${id}`);
       return null;
     }
