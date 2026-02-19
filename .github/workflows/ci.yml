@@ -288,6 +288,31 @@ jobs:
         env:
           VITE_API_URL: ${{ matrix.api_url }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend/Dockerfile
+          target: production
+          push: false
+          tags: taskflow-backend:${{ matrix.environment }}
+          build-args: |
+            NODE_ENV=${{ matrix.environment }}
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend/Dockerfile
+          target: production
+          push: false
+          tags: taskflow-frontend:${{ matrix.environment }}
+          build-args: |
+            VITE_API_URL=${{ matrix.api_url }}
+
       - name: Generate build-info.json
         run: |
           cat > build-info.json << EOF
